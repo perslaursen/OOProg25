@@ -6,7 +6,7 @@ namespace ItemRazorV5.Models
     {
         [Display(Name = "Item ID")]
         [Required(ErrorMessage = "Der skal angives et ID til Item")]
-        [Range(typeof(int), "0", "10000", ErrorMessage = "ID skal være mellem {1} og (2)")]
+        [Range(typeof(int), "0", "10000", ErrorMessage = "ID skal være mellem {1} og {2}")]
         public int? Id { get; set; }
 
         [Display(Name = "Item Navn")]

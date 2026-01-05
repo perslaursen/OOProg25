@@ -59,7 +59,7 @@ public class Order
             }
         }
 
-        // Add 2 % EU tax (after state tax and shipping), however at most 1 kr. per item
+        // Add 2 % EU tax (after state tax and shipping), however at least 1 kr. per item
         for (int index = 0; index < itemPriceListCopy.Count; index++)
         {
             itemPriceListCopy[index] = itemPriceListCopy[index] + ((itemPriceListCopy[index] > 50) ? itemPriceListCopy[index] * 0.02 : 1);
