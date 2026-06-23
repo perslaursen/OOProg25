@@ -1,0 +1,124 @@
+﻿@page
+@using ZeaQuest.Models.Base
+@model ZeaQuest.Pages.ChooseArmorModel
+@{
+}
+
+<p class="display-6 fw-bold">Choose Armor for @Model.ChosenHero.Name</p>
+
+<p class="m-0 fst-italic">Each piece of Armor will reduce any received damage by a specified percentage. The damage reduction is however distributed over the various damage flavors.</p>
+<p class="m-0 fst-italic">Furthermore, each piece of Armor belongs to a body "slot" (feet, hands, chest, head). You can only pick one piece of Armor for each slot.</p>
+<p class="m-0 fst-italic">The exact way that multiple pieces of Armor contribute to the total damage resistance is mysterious and important...</p>
+
+
+<!-- Tab Navigation Hooks -->
+<ul class="nav nav-tabs mt-2" id="myTab" role="tablist">
+	@foreach (var armorType in Model.ArmorTypeList)
+	{
+		// Tjekker om denne tab matcher den aktive tab fra serveren.
+		// Hvis ActiveTab er default (fx Feet/0), falder den tilbage på at aktivere den første tab automatisk.
+		var isSelected = Model.ActiveTab == armorType || (Model.ActiveTab == 0 && armorType == Model.ArmorTypeList.First());
+		var activeClass = isSelected ? "active" : "";
+		var ariaSelected = isSelected ? "true" : "false";
+		var textColoring = Model.AnySelectedInGroup(armorType) ? "text-danger" : "text-primary";
+
+		<li class="nav-item" role="presentation">
+			<button class="nav-link @activeClass @textColoring"
+					id="@armorType-tab"
+					data-bs-toggle="tab"
+					data-bs-target="#@armorType"					
+					type="button"
+					role="tab"
+					aria-controls="@armorType"
+					aria-selected="@ariaSelected">
+				@armorType.ToString()
+			</button>
+		</li>
+	}
+</ul>
+
+<!-- Tab Content Containers -->
+<div class="tab-content border-start border-end border-bottom p-3" id="myTabContent">
+	@foreach (var armorType in Model.ArmorTypeList)
+	{
+		// Tjekker om dette panel skal vises som standard
+		var isSelectedPanel = Model.ActiveTab == armorType || (Model.ActiveTab == 0 && armorType == Model.ArmorTypeList.First());
+		var panelClass = isSelectedPanel ? "show active" : "";
+
+		<div class="tab-pane fade @panelClass" id="@armorType" role="tabpanel" aria-labelledby="@armorType-tab">
+			<div class="container mt-3">
+				<div class="row">
+					@for (int aIndex = 0; aIndex < Model.ArmorList.Count; aIndex++)
+					{
+						var armor = Model.ArmorList[aIndex];
+						if (armor.ArmorType == armorType)
+						{
+							<div class="col-md-3 p-3">
+								<div class="card @(Model.ChosenArmor[aIndex] ? "border-5 border-danger" : string.Empty) shadow" style="width: 16rem;">
+									<div class="card-header d-flex justify-content-between">
+										<h5 class="fw-bold">@armor.Name</h5>
+										@if (armor.ArmorType == ArmorType.Feet)
+										{
+											<i class="fa fa-xl mt-3 fa-socks" style="color: darkgoldenrod;"></i>
+										}
+										else if (armor.ArmorType == ArmorType.Hands)
+										{
+											<i class="fa fa-xl mt-3 fa-hand" style="color: coral;"></i>
+										}
+										else if (armor.ArmorType == ArmorType.Chest)
+										{
+											<i class="fa fa-xl mt-3 fa-shirt" style="color: purple;"></i>
+										}
+										else if (armor.ArmorType == ArmorType.Head)
+										{
+											<i class="fa fa-xl mt-3 fa-helmet-safety" style="color: crimson;"></i>
+										}
+									</div>
+									<div class="card-body d-flex flex-column">
+										<img class="img-thumbnail mb-2" src="/images/armor/@(armor.Name.Replace(" ", string.Empty)).jpg">
+										<div class="d-flex">
+											<div>
+												<div class="d-flex justify-content-between">
+													<div class="me-3">
+														<i class="fa fa-snowflake" style="color: blue;"></i>
+														<span>@armor.DamageResistance.GetPercentage(DamageType.Frost)</span>
+													</div>
+													<div class="me-3">
+														<i class="fa fa-fire" style="color: red;"></i>
+														<span>@armor.DamageResistance.GetPercentage(DamageType.Fire)</span>
+													</div>
+													<div class="me-3">
+														<i class="fa fa-square-virus" style="color: yellowgreen;"></i>
+														<span>@armor.DamageResistance.GetPercentage(DamageType.Necrotic)</span>
+													</div>
+													<div class="me-3">
+														<i class="fa fa-hand-fist" style="color: black;"></i>
+														<span>@armor.DamageResistance.GetPercentage(DamageType.Physical)</span>
+													</div>
+												</div>
+
+
+												@if (Model.ChosenArmor[aIndex])
+												{
+													<a class="btn btn-danger btn-sm mt-3" type="button" title="Selected" asp-page-handler="UpdateSelection" asp-route-id="@aIndex" asp-route-activeTab="@armorType">Unselect</a>
+												}
+												else
+												{
+													<a class="btn btn-primary btn-sm mt-3" type="button" title="Select" asp-page-handler="UpdateSelection" asp-route-id="@aIndex" asp-route-activeTab="@armorType">Select</a>
+												}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						}
+					}
+				</div>
+			</div>
+		</div>
+	}
+</div>
+
+<a class="btn btn-danger btn-lg mt-3 me-3" asp-page="ChooseWeapon"> Back </a>
+
+<a class="btn btn-primary btn-lg mt-3" type="button" title="Select" asp-page="ChooseBeast">Choose a Beast</a>
